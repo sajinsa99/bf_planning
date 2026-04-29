@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planning BF</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <button id="prev-month" aria-label="Mois précédent">&#8592;</button>
+    <h1 id="month-title"></h1>
+    <button id="next-month" aria-label="Mois suivant">&#8594;</button>
+    <button id="edit-toggle">Mode édition</button>
+  </header>
+
+  <div id="calendar-header" class="calendar-grid">
+    <div class="day-header">Lun</div>
+    <div class="day-header">Mar</div>
+    <div class="day-header">Mer</div>
+    <div class="day-header">Jeu</div>
+    <div class="day-header">Ven</div>
+    <div class="day-header">Sam</div>
+    <div class="day-header">Dim</div>
+  </div>
+  <div id="calendar" class="calendar-grid"></div>
+
+  <dialog id="password-dialog">
+    <form method="dialog">
+      <h2>Mot de passe</h2>
+      <input type="password" id="password-input" placeholder="Entrez le mot de passe" autocomplete="current-password">
+      <div class="dialog-buttons">
+        <button type="button" id="password-submit">Valider</button>
+        <button type="button" id="password-cancel">Annuler</button>
+      </div>
+      <p id="password-error" class="error" hidden>Mot de passe incorrect</p>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
