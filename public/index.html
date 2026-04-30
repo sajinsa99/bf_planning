@@ -8,14 +8,24 @@
 </head>
 <body>
   <header>
-    <button id="prev-month" aria-label="Mois précédent">&#8592;</button>
-    <h1 id="month-title"></h1>
-    <button id="next-month" aria-label="Mois suivant">&#8594;</button>
-    <button id="edit-toggle">Mode édition</button>
+    <button type="button" id="prev-month" aria-label="Mois précédent">&#8592;</button>
+    <h1 id="month-title">&#8203;</h1>
+    <button type="button" id="next-month" aria-label="Mois suivant">&#8594;</button>
+    <button type="button" id="edit-toggle">Mode édition</button>
   </header>
 
   <div id="edit-banner" hidden>
-    &#9998; Mode édition — cliquez sur un créneau pour modifier
+    &#9998; Mode édition — cliquez sur les créneaux pour les sélectionner
+  </div>
+
+  <div id="action-bar" hidden>
+    <span id="selection-count"></span>
+    <div class="action-buttons">
+      <button type="button" id="apply-yann">Yann</button>
+      <button type="button" id="apply-bruno">Bruno</button>
+      <button type="button" id="apply-clear">Effacer</button>
+      <button type="button" id="deselect-all">Désélectionner tout</button>
+    </div>
   </div>
 
   <div id="calendar-header" class="calendar-grid">
@@ -34,7 +44,7 @@
       <h2>Mot de passe</h2>
       <input type="password" id="password-input" placeholder="Entrez le mot de passe" autocomplete="current-password">
       <div class="dialog-buttons">
-        <button type="button" id="password-submit">Valider</button>
+        <button type="submit" id="password-submit">Valider</button>
         <button type="button" id="password-cancel">Annuler</button>
       </div>
       <p id="password-error" class="error" hidden>Mot de passe incorrect</p>

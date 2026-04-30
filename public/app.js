@@ -10,6 +10,7 @@ let currentYear = new Date().getFullYear();
 let currentMonth = new Date().getMonth() + 1;
 let schedule = {};
 let editMode = false;
+let selectedSlots = new Set(); // keys: "day-slot" e.g. "5-morning"
 let password = sessionStorage.getItem('bf_password') || '';
 
 async function fetchSchedule() {
@@ -75,6 +76,7 @@ function renderCalendar() {
       slotEl.appendChild(name);
       slotEl.dataset.day = day;
       slotEl.dataset.slot = slot;
+      if (selectedSlots.has(`${day}-${slot}`)) slotEl.classList.add('selected');
       slotEl.addEventListener('click', handleSlotClick);
       cell.appendChild(slotEl);
     }
@@ -87,19 +89,46 @@ function renderCalendar() {
   document.querySelector('header').classList.toggle('edit-mode', editMode);
   document.getElementById('edit-toggle').classList.toggle('active', editMode);
   document.getElementById('edit-toggle').textContent = editMode ? 'Quitter édition' : 'Mode édition';
+
+  const actionBar = document.getElementById('action-bar');
+  actionBar.hidden = !editMode || selectedSlots.size === 0;
+  if (editMode && selectedSlots.size > 0) {
+    const n = selectedSlots.size;
+    document.getElementById('selection-count').textContent =
+      `${n} créneau${n > 1 ? 'x' : ''} sélectionné${n > 1 ? 's' : ''}`;
+  }
 }
 
-async function handleSlotClick(e) {
+function handleSlotClick(e) {
   if (!editMode) return;
   const day = String(parseInt(e.currentTarget.dataset.day, 10));
   const slot = e.currentTarget.dataset.slot;
+  const key = `${day}-${slot}`;
 
-  if (!schedule[day]) schedule[day] = { morning: null, evening: null };
-  const current = schedule[day][slot];
-  const idx = NAMES.indexOf(current);
-  schedule[day][slot] = NAMES[(idx + 1) % NAMES.length];
+  if (selectedSlots.has(key)) {
+    selectedSlots.delete(key);
+  } else {
+    selectedSlots.add(key);
+  }
+  renderCalendar();
+}
 
+async function applyToSelected(value) {
+  if (selectedSlots.size === 0) return;
+  for (const key of selectedSlots) {
+    const dash = key.indexOf('-');
+    const day = key.slice(0, dash);
+    const slot = key.slice(dash + 1);
+    if (!schedule[day]) schedule[day] = { morning: null, evening: null };
+    schedule[day][slot] = value;
+  }
+  selectedSlots.clear();
   await saveSchedule();
+  renderCalendar();
+}
+
+function clearSelection() {
+  selectedSlots.clear();
   renderCalendar();
 }
 
@@ -125,6 +154,7 @@ async function saveSchedule() {
 function exitEditMode() {
   editMode = false;
   password = '';
+  selectedSlots.clear();
   sessionStorage.removeItem('bf_password');
   renderCalendar();
 }
@@ -197,17 +227,24 @@ document.getElementById('password-input').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') document.getElementById('password-submit').click();
 });
 
+document.getElementById('apply-yann').addEventListener('click', () => applyToSelected('Yann'));
+document.getElementById('apply-bruno').addEventListener('click', () => applyToSelected('Bruno'));
+document.getElementById('apply-clear').addEventListener('click', () => applyToSelected(null));
+document.getElementById('deselect-all').addEventListener('click', clearSelection);
+
 document.getElementById('edit-toggle').addEventListener('click', toggleEditMode);
 
 document.getElementById('prev-month').addEventListener('click', () => {
   currentMonth--;
   if (currentMonth < 1) { currentMonth = 12; currentYear--; }
+  selectedSlots.clear();
   fetchSchedule();
 });
 
 document.getElementById('next-month').addEventListener('click', () => {
   currentMonth++;
   if (currentMonth > 12) { currentMonth = 1; currentYear++; }
+  selectedSlots.clear();
   fetchSchedule();
 });
 
