@@ -57,14 +57,15 @@ echo "==> Configuring nginx..."
 mkdir -p /etc/nginx/snippets
 cp "$INSTALL_DIR/deploy/nginx-bf_planning.conf" "$NGINX_SNIPPET"
 
-# Inject include into the bruno SSL server block if not already present
+# Inject include into the bruno SSL server block, replacing any stale path
 if [[ -f "$BRUNO_CONF" ]]; then
-  if ! grep -q "bf_planning_location" "$BRUNO_CONF"; then
-    # Insert the include line before the closing } of the first (SSL) server block
+  if grep -q "bf_planning_location" "$BRUNO_CONF"; then
+    # Replace whatever path was previously injected with the correct one
+    sed -i "s|include .*/bf_planning_location.conf;|include $NGINX_SNIPPET;|" "$BRUNO_CONF"
+    echo "    Updated include path in $BRUNO_CONF"
+  else
     sed -i '/listen 443 ssl/a\    include /etc/nginx/snippets/bf_planning_location.conf;' "$BRUNO_CONF"
     echo "    Injected include into $BRUNO_CONF"
-  else
-    echo "    Include already present in $BRUNO_CONF, skipping."
   fi
 else
   echo "  WARNING: $BRUNO_CONF not found. Add manually to your nginx vhost:" >&2
