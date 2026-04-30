@@ -183,6 +183,11 @@ header.edit-mode {
   color: #bbb;
 }
 
+.edit-mode .locked-day .day-number::after {
+  content: ' \1F512';
+  font-size: 0.6rem;
+}
+
 .locked-day .slot {
   opacity: 0.55;
 }
