@@ -48,7 +48,9 @@ app.use(express.json());
 
 app.post('/api/auth', (req, res) => {
   const { password } = req.body;
-  res.json({ ok: password === APP_PASSWORD });
+  const ok = password === APP_PASSWORD;
+  console.log(`[auth] received="${password}" expected="${APP_PASSWORD}" ok=${ok}`);
+  res.json({ ok });
 });
 
 app.get('/api/schedule/:year/:month', (req, res) => {
