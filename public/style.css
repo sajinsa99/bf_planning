@@ -151,8 +151,12 @@ header.edit-mode {
   color: #c06010;
 }
 
+.slot.empty {
+  background: #fff0f0;
+}
+
 .slot.empty .slot-name {
-  color: #bbb;
+  color: #e05050;
 }
 
 .slot.filtered-out {
