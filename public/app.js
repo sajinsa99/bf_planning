@@ -72,6 +72,9 @@ function renderCalendar() {
     const locked = isPastDay(currentYear, currentMonth, day);
     if (locked) cell.classList.add('locked-day');
 
+    const dayOfWeek = new Date(currentYear, currentMonth - 1, day).getDay();
+    if (dayOfWeek === 0 || dayOfWeek === 6) cell.classList.add('weekend');
+
     const isToday = today.getFullYear() === currentYear &&
       today.getMonth() + 1 === currentMonth &&
       today.getDate() === day;

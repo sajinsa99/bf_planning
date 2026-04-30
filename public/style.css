@@ -109,6 +109,10 @@ header.edit-mode {
   border: none;
 }
 
+.day-cell.weekend {
+  background: #f0ede8;
+}
+
 .day-cell.today {
   border-color: #4a90d9;
   border-width: 2px;
