@@ -13,6 +13,20 @@ let editMode = false;
 let filter = 'all';
 let selectedSlots = new Set(); // keys: "day-slot" e.g. "5-morning"
 let password = sessionStorage.getItem('bf_password') || '';
+let holidays = new Map(); // key: "YYYYMMDD", value: holiday name
+
+async function loadHolidays() {
+  try {
+    const res = await fetch('public_holidays.ics');
+    const text = await res.text();
+    const events = text.split('BEGIN:VEVENT');
+    for (const ev of events.slice(1)) {
+      const dm = ev.match(/DTSTART;VALUE=DATE:(\d{8})/);
+      const sm = ev.match(/SUMMARY:(.+)/);
+      if (dm && sm) holidays.set(dm[1], sm[1].trim());
+    }
+  } catch { /* static file unavailable */ }
+}
 
 function isPastDay(year, month, day) {
   const today = new Date();
@@ -67,6 +81,18 @@ function renderCalendar() {
     num.className = 'day-number';
     num.textContent = day;
     cell.appendChild(num);
+
+    const yyyymmdd = `${currentYear}${String(currentMonth).padStart(2,'0')}${String(day).padStart(2,'0')}`;
+    const holidayName = holidays.get(yyyymmdd);
+    if (holidayName) {
+      cell.classList.add('holiday');
+      const hLabel = document.createElement('div');
+      hLabel.className = 'holiday-label';
+      hLabel.textContent = '🎉';
+      hLabel.dataset.holiday = holidayName;
+      hLabel.title = holidayName;
+      cell.appendChild(hLabel);
+    }
 
     for (const slot of ['morning', 'evening']) {
       const slotEl = document.createElement('div');
@@ -265,4 +291,4 @@ document.getElementById('next-month').addEventListener('click', () => {
   fetchSchedule();
 });
 
-fetchSchedule();
+loadHolidays().then(fetchSchedule);

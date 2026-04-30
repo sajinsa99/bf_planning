@@ -101,7 +101,6 @@ header.edit-mode {
   background: #fff;
   border: 1px solid #e0e0e0;
   border-radius: 6px;
-  overflow: hidden;
   min-height: 80px;
 }
 
@@ -121,6 +120,56 @@ header.edit-mode {
   color: #666;
   padding: 4px 6px 2px;
   text-align: right;
+}
+
+.holiday .day-number {
+  color: #b36b00;
+}
+
+.holiday-label {
+  position: relative;
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 0 5px 3px;
+  cursor: default;
+  user-select: none;
+}
+
+.holiday-label::after {
+  content: attr(data-holiday);
+  position: absolute;
+  bottom: calc(100% + 5px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 100;
+}
+
+.holiday-label::before {
+  content: '';
+  position: absolute;
+  bottom: calc(100% + 1px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: #333;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 100;
+}
+
+.holiday-label:hover::after,
+.holiday-label:hover::before {
+  opacity: 1;
 }
 
 .slot {
@@ -300,5 +349,10 @@ dialog input {
 
   .slot-name {
     font-size: 0.7rem;
+  }
+
+  .holiday-label {
+    font-size: 0.65rem;
+    padding: 0 3px 2px;
   }
 }
