@@ -14,6 +14,28 @@ let filter = 'all';
 let selectedSlots = new Set(); // keys: "day-slot" e.g. "5-morning"
 let password = sessionStorage.getItem('bf_password') || '';
 let holidays = new Map(); // key: "YYYYMMDD", value: holiday name
+let filterDay = null;
+
+function initFilters() {
+  const monthSel = document.getElementById('month-select');
+  MONTHS_FR.forEach((name, i) => {
+    const opt = document.createElement('option');
+    opt.value = i + 1;
+    opt.textContent = name;
+    monthSel.appendChild(opt);
+  });
+  const daySel = document.getElementById('day-select');
+  const none = document.createElement('option');
+  none.value = '';
+  none.textContent = 'Jour';
+  daySel.appendChild(none);
+  for (let d = 1; d <= 31; d++) {
+    const opt = document.createElement('option');
+    opt.value = d;
+    opt.textContent = d;
+    daySel.appendChild(opt);
+  }
+}
 
 async function loadHolidays() {
   try {
@@ -51,6 +73,12 @@ function renderCalendar() {
   const grid = document.getElementById('calendar');
   grid.innerHTML = '';
 
+  document.getElementById('month-select').value = currentMonth;
+  document.getElementById('day-select').value = filterDay ?? '';
+  document.getElementById('view-filters').hidden = editMode;
+  document.getElementById('reset-filters').hidden = filterDay === null;
+  grid.classList.toggle('single-day', filterDay !== null);
+
   const today = new Date();
   const firstDay = new Date(currentYear, currentMonth - 1, 1);
   const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
@@ -59,13 +87,16 @@ function renderCalendar() {
   let startOffset = firstDay.getDay() - 1;
   if (startOffset < 0) startOffset = 6;
 
-  for (let i = 0; i < startOffset; i++) {
-    const empty = document.createElement('div');
-    empty.className = 'day-cell empty-cell';
-    grid.appendChild(empty);
+  if (filterDay === null) {
+    for (let i = 0; i < startOffset; i++) {
+      const empty = document.createElement('div');
+      empty.className = 'day-cell empty-cell';
+      grid.appendChild(empty);
+    }
   }
 
   for (let day = 1; day <= daysInMonth; day++) {
+    if (filterDay !== null && day !== filterDay) continue;
     const cell = document.createElement('div');
     cell.className = 'day-cell';
 
@@ -294,4 +325,27 @@ document.getElementById('next-month').addEventListener('click', () => {
   fetchSchedule();
 });
 
+document.getElementById('month-select').addEventListener('change', (e) => {
+  currentMonth = parseInt(e.target.value, 10);
+  const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+  if (filterDay !== null && filterDay > daysInMonth) filterDay = null;
+  selectedSlots.clear();
+  fetchSchedule();
+});
+
+document.getElementById('day-select').addEventListener('change', (e) => {
+  filterDay = e.target.value ? parseInt(e.target.value, 10) : null;
+  renderCalendar();
+});
+
+document.getElementById('reset-filters').addEventListener('click', () => {
+  const now = new Date();
+  currentYear = now.getFullYear();
+  currentMonth = now.getMonth() + 1;
+  filterDay = null;
+  selectedSlots.clear();
+  fetchSchedule();
+});
+
+initFilters();
 loadHolidays().then(fetchSchedule);

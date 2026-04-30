@@ -76,6 +76,39 @@ header.edit-mode {
   letter-spacing: 0.02em;
 }
 
+#view-filters {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+}
+
+#view-filters[hidden] { display: none; }
+
+#view-filters select {
+  padding: 0.35rem 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  background: #fff;
+  cursor: pointer;
+}
+
+#reset-filters {
+  padding: 0.35rem 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+#reset-filters:hover {
+  background: #f0f0f0;
+}
+
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -87,6 +120,11 @@ header.edit-mode {
 
 #calendar-header {
   padding-top: 0.8rem;
+}
+
+#calendar.single-day {
+  grid-template-columns: 1fr;
+  max-width: 320px;
 }
 
 .day-header {
