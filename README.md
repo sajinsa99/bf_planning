@@ -23,7 +23,9 @@ APP_PASSWORD=votre-mot-de-passe-secret
 PORT=3000
 ```
 
-> Adaptez `server_name` dans [deploy/nginx-bf_planning.conf](deploy/nginx-bf_planning.conf) si vous avez un nom de domaine, avant de lancer `install.sh`.
+L'application sera accessible sur **https://bfablet92.hd.free.fr/planning/**
+
+> `install.sh` injecte automatiquement la configuration nginx dans le vhost existant.
 
 ## Structure du projet
 
