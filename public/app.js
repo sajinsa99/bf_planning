@@ -83,6 +83,8 @@ function renderCalendar() {
   }
 
   document.getElementById('calendar').classList.toggle('edit-mode', editMode);
+  document.getElementById('edit-banner').hidden = !editMode;
+  document.querySelector('header').classList.toggle('edit-mode', editMode);
   document.getElementById('edit-toggle').classList.toggle('active', editMode);
   document.getElementById('edit-toggle').textContent = editMode ? 'Quitter édition' : 'Mode édition';
 }
