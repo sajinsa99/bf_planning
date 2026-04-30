@@ -10,6 +10,7 @@ let currentYear = new Date().getFullYear();
 let currentMonth = new Date().getMonth() + 1;
 let schedule = {};
 let editMode = false;
+let filter = 'all';
 let selectedSlots = new Set(); // keys: "day-slot" e.g. "5-morning"
 let password = sessionStorage.getItem('bf_password') || '';
 
@@ -77,6 +78,7 @@ function renderCalendar() {
       slotEl.dataset.day = day;
       slotEl.dataset.slot = slot;
       if (selectedSlots.has(`${day}-${slot}`)) slotEl.classList.add('selected');
+      if (filter !== 'all' && value !== filter) slotEl.classList.add('filtered-out');
       slotEl.addEventListener('click', handleSlotClick);
       cell.appendChild(slotEl);
     }
@@ -89,6 +91,7 @@ function renderCalendar() {
   document.querySelector('header').classList.toggle('edit-mode', editMode);
   document.getElementById('edit-toggle').classList.toggle('active', editMode);
   document.getElementById('edit-toggle').textContent = editMode ? 'Quitter édition' : 'Mode édition';
+  document.getElementById('filter-select').hidden = editMode;
 
   const actionBar = document.getElementById('action-bar');
   actionBar.hidden = !editMode || selectedSlots.size === 0;
@@ -225,6 +228,11 @@ document.getElementById('password-cancel').addEventListener('click', () => {
 
 document.getElementById('password-input').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') document.getElementById('password-submit').click();
+});
+
+document.getElementById('filter-select').addEventListener('change', (e) => {
+  filter = e.target.value;
+  renderCalendar();
 });
 
 document.getElementById('apply-yann').addEventListener('click', () => applyToSelected('Yann'));

@@ -45,6 +45,16 @@ header button:hover {
   margin-left: auto;
 }
 
+#filter-select {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  background: #fff;
+  cursor: pointer;
+}
+
+
 #edit-toggle.active {
   background: #e8f4e8;
   border-color: #5a9c5a;
@@ -143,6 +153,10 @@ header.edit-mode {
 
 .slot.empty .slot-name {
   color: #bbb;
+}
+
+.slot.filtered-out {
+  opacity: 0.15;
 }
 
 .edit-mode .day-cell:not(.empty-cell) .slot {
