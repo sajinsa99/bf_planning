@@ -163,13 +163,13 @@ header.edit-mode {
   opacity: 0.15;
 }
 
-.edit-mode .day-cell:not(.empty-cell) .slot {
+.edit-mode .day-cell:not(.empty-cell):not(.locked-day) .slot {
   cursor: pointer;
   border-radius: 3px;
   transition: background 0.1s;
 }
 
-.edit-mode .day-cell:not(.empty-cell) .slot:hover {
+.edit-mode .day-cell:not(.empty-cell):not(.locked-day) .slot:hover {
   background: #f8f8f8;
 }
 
@@ -177,6 +177,14 @@ header.edit-mode {
   background: #e8f4ff;
   outline: 2px solid #4a90d9;
   outline-offset: -2px;
+}
+
+.locked-day .day-number {
+  color: #bbb;
+}
+
+.locked-day .slot {
+  opacity: 0.55;
 }
 
 #action-bar {

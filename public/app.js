@@ -14,6 +14,12 @@ let filter = 'all';
 let selectedSlots = new Set(); // keys: "day-slot" e.g. "5-morning"
 let password = sessionStorage.getItem('bf_password') || '';
 
+function isPastDay(year, month, day) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return new Date(year, month - 1, day) < today;
+}
+
 async function fetchSchedule() {
   try {
     const res = await fetch(`api/schedule/${currentYear}/${currentMonth}`);
@@ -49,6 +55,9 @@ function renderCalendar() {
     const cell = document.createElement('div');
     cell.className = 'day-cell';
 
+    const locked = isPastDay(currentYear, currentMonth, day);
+    if (locked) cell.classList.add('locked-day');
+
     const isToday = today.getFullYear() === currentYear &&
       today.getMonth() + 1 === currentMonth &&
       today.getDate() === day;
@@ -77,9 +86,9 @@ function renderCalendar() {
       slotEl.appendChild(name);
       slotEl.dataset.day = day;
       slotEl.dataset.slot = slot;
-      if (selectedSlots.has(`${day}-${slot}`)) slotEl.classList.add('selected');
+      if (!locked && selectedSlots.has(`${day}-${slot}`)) slotEl.classList.add('selected');
       if (filter !== 'all' && value !== filter) slotEl.classList.add('filtered-out');
-      slotEl.addEventListener('click', handleSlotClick);
+      if (!locked) slotEl.addEventListener('click', handleSlotClick);
       cell.appendChild(slotEl);
     }
 
