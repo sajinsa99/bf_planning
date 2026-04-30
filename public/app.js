@@ -14,7 +14,7 @@ let password = sessionStorage.getItem('bf_password') || '';
 
 async function fetchSchedule() {
   try {
-    const res = await fetch(`/api/schedule/${currentYear}/${currentMonth}`);
+    const res = await fetch(`api/schedule/${currentYear}/${currentMonth}`);
     schedule = await res.json();
   } catch {
     schedule = {};
@@ -103,7 +103,7 @@ async function handleSlotClick(e) {
 
 async function saveSchedule() {
   try {
-    const res = await fetch(`/api/schedule/${currentYear}/${currentMonth}`, {
+    const res = await fetch(`api/schedule/${currentYear}/${currentMonth}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -134,7 +134,7 @@ async function toggleEditMode() {
   }
 
   if (password) {
-    const res = await fetch('/api/auth', {
+    const res = await fetch('api/auth', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password })
