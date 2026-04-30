@@ -328,6 +328,17 @@ document.getElementById('next-month').addEventListener('click', () => {
   fetchSchedule();
 });
 
+document.getElementById('refresh-view').addEventListener('click', () => {
+  const now = new Date();
+  currentYear = now.getFullYear();
+  currentMonth = now.getMonth() + 1;
+  filterDay = null;
+  filter = 'all';
+  document.getElementById('filter-select').value = 'all';
+  selectedSlots.clear();
+  fetchSchedule();
+});
+
 document.getElementById('month-select').addEventListener('change', (e) => {
   currentMonth = parseInt(e.target.value, 10);
   const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();

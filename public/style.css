@@ -96,16 +96,18 @@ header.edit-mode {
   cursor: pointer;
 }
 
-#reset-filters {
-  padding: 0.35rem 0.8rem;
+#reset-filters,
+#refresh-view {
+  padding: 0.35rem 0.7rem;
   border: 1px solid #ccc;
   border-radius: 4px;
   background: #fff;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
-#reset-filters:hover {
+#reset-filters:hover,
+#refresh-view:hover {
   background: #f0f0f0;
 }
 
