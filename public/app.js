@@ -169,7 +169,7 @@ document.getElementById('password-submit').addEventListener('click', async () =>
   const error = document.getElementById('password-error');
   const candidate = input.value;
 
-  const res = await fetch('/api/auth', {
+  const res = await fetch('api/auth', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ password: candidate })
