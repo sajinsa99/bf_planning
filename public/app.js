@@ -147,7 +147,10 @@ function renderCalendar() {
       slotEl.dataset.day = day;
       slotEl.dataset.slot = slot;
       if (!locked && selectedSlots.has(`${day}-${slot}`)) slotEl.classList.add('selected');
-      if (filter !== 'all' && value !== filter) slotEl.classList.add('filtered-out');
+      if (filter !== 'all') {
+        const isMatch = filter === 'Manquant' ? value === null : value === filter;
+        if (!isMatch) slotEl.classList.add('filtered-out');
+      }
       if (!locked) slotEl.addEventListener('click', handleSlotClick);
       cell.appendChild(slotEl);
     }
