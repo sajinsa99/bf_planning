@@ -89,12 +89,12 @@ function renderCalendar() {
     const holidayName = holidays.get(yyyymmdd);
     if (holidayName) {
       cell.classList.add('holiday');
-      const hLabel = document.createElement('div');
-      hLabel.className = 'holiday-label';
-      hLabel.textContent = '🎉';
-      hLabel.dataset.holiday = holidayName;
-      hLabel.title = holidayName;
-      cell.appendChild(hLabel);
+      const hSpan = document.createElement('span');
+      hSpan.className = 'holiday-label';
+      hSpan.textContent = ' 🎉';
+      hSpan.dataset.holiday = holidayName;
+      hSpan.title = holidayName;
+      num.appendChild(hSpan);
     }
 
     for (const slot of ['morning', 'evening']) {

@@ -133,8 +133,6 @@ header.edit-mode {
 .holiday-label {
   position: relative;
   display: inline-block;
-  font-size: 0.75rem;
-  padding: 0 5px 3px;
   cursor: default;
   user-select: none;
 }
@@ -353,10 +351,5 @@ dialog input {
 
   .slot-name {
     font-size: 0.7rem;
-  }
-
-  .holiday-label {
-    font-size: 0.65rem;
-    padding: 0 3px 2px;
   }
 }
