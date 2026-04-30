@@ -43,7 +43,9 @@ function validateSchedule(data) {
   return true;
 }
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), {
+  setHeaders: (res) => res.setHeader('Cache-Control', 'no-cache')
+}));
 app.use(express.json());
 
 app.post('/api/auth', (req, res) => {
