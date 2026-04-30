@@ -5,8 +5,8 @@ After=network.target
 [Service]
 Type=simple
 User=www-data
-WorkingDirectory=/opt/bf-planning
-EnvironmentFile=/opt/bf-planning/.env
+WorkingDirectory=/opt/bf_planning
+EnvironmentFile=/opt/bf_planning/.env
 ExecStart=/usr/bin/node server.js
 Restart=on-failure
 RestartSec=5

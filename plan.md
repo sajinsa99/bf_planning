@@ -26,8 +26,8 @@ bf_planning/
 │   ├── style.css             # Calendar grid styles
 │   └── app.js                # Frontend logic
 └── deploy/
-    ├── bf-planning.service   # systemd unit
-    └── nginx-bf-planning.conf
+    ├── bf_planning.service   # systemd unit
+    └── nginx-bf_planning.conf
 ```
 
 ## Implementation Details
@@ -70,17 +70,17 @@ bf_planning/
 
 ### Deployment files
 
-**`deploy/bf-planning.service`:** systemd unit running as www-data, `EnvironmentFile=/opt/bf-planning/.env`, auto-restart on failure.
+**`deploy/bf_planning.service`:** systemd unit running as www-data, `EnvironmentFile=/opt/bf_planning/.env`, auto-restart on failure.
 
-**`deploy/nginx-bf-planning.conf`:** Reverse proxy `location /` → `http://127.0.0.1:3000`.
+**`deploy/nginx-bf_planning.conf`:** Reverse proxy `location /` → `http://127.0.0.1:3000`.
 
 ## Deployment Steps (on server)
 
 1. `sudo apt install nodejs npm`
-2. Copy project to `/opt/bf-planning/`
-3. `cd /opt/bf-planning && npm install --production`
+2. Copy project to `/opt/bf_planning/`
+3. `cd /opt/bf_planning && npm install --production`
 4. Create `.env` with `APP_PASSWORD=<chosen-password>` and `PORT=3000`
-5. `sudo mkdir -p /opt/bf-planning/data && sudo chown www-data:www-data /opt/bf-planning/data`
+5. `sudo mkdir -p /opt/bf_planning/data && sudo chown www-data:www-data /opt/bf_planning/data`
 6. Install systemd service, enable and start
 7. Install nginx config, reload nginx
 

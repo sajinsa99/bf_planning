@@ -87,5 +87,5 @@ app.post('/api/schedule/:year/:month', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`bf-planning running on port ${PORT}`);
+  console.log(`bf_planning running on port ${PORT}`);
 });

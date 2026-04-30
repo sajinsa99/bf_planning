@@ -50,34 +50,19 @@ bf_planning/
 │   ├── style.css
 │   └── app.js
 └── deploy/
-    ├── bf-planning.service    # Unité systemd
-    └── nginx-bf-planning.conf
+    ├── bf_planning.service    # Unité systemd
+    └── nginx-bf_planning.conf
 ```
 
 ## Déploiement sur Ubuntu 24.04
 
-### 1. Installer Node.js
+### 1. Créer `/opt/bf_planning/.env`
+
+Avant de lancer l'installation, créez le fichier `.env` sur le serveur :
 
 ```bash
-sudo apt install nodejs npm
-```
-
-### 2. Copier le projet
-
-```bash
-sudo cp -r bf_planning /opt/bf-planning
-```
-
-### 3. Installer les dépendances
-
-```bash
-cd /opt/bf-planning && sudo npm install --production
-```
-
-### 4. Créer le fichier `.env`
-
-```bash
-sudo nano /opt/bf-planning/.env
+sudo mkdir -p /opt/bf_planning
+sudo nano /opt/bf_planning/.env
 ```
 
 Contenu :
@@ -87,31 +72,23 @@ APP_PASSWORD=votre-mot-de-passe-secret
 PORT=3000
 ```
 
-### 5. Préparer le dossier data
+### 2. Lancer le script d'installation
+
+Depuis le répertoire du projet cloné sur le serveur :
 
 ```bash
-sudo mkdir -p /opt/bf-planning/data
-sudo chown www-data:www-data /opt/bf-planning/data
+sudo bash install.sh
 ```
 
-### 6. Installer le service systemd
+Le script effectue automatiquement :
+- installation de Node.js/npm si absent
+- copie des fichiers vers `/opt/bf_planning/`
+- `npm install --production`
+- configuration du service systemd (`bf_planning.service`)
+- configuration nginx (reverse proxy port 80 → 3000)
+- démarrage du service
 
-```bash
-sudo cp /opt/bf-planning/deploy/bf-planning.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable bf-planning
-sudo systemctl start bf-planning
-```
-
-### 7. Configurer nginx
-
-```bash
-sudo cp /opt/bf-planning/deploy/nginx-bf-planning.conf /etc/nginx/sites-available/bf-planning
-sudo ln -s /etc/nginx/sites-available/bf-planning /etc/nginx/sites-enabled/
-sudo nginx -t && sudo systemctl reload nginx
-```
-
-> Adaptez `server_name` dans le fichier nginx si vous avez un nom de domaine.
+> Adaptez `server_name` dans [deploy/nginx-bf_planning.conf](deploy/nginx-bf_planning.conf) si vous avez un nom de domaine.
 
 ## API
 

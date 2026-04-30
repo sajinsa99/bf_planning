@@ -1,5 +1,5 @@
 {
-  "name": "bf-planning",
+  "name": "bf_planning",
   "version": "1.0.0",
   "description": "Duty schedule calendar for morning/evening slots",
   "main": "server.js",
