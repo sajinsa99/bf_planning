@@ -3,7 +3,7 @@ set -euo pipefail
 
 INSTALL_DIR="/opt/bf_planning"
 SERVICE_NAME="bf_planning"
-NGINX_SNIPPET="/etc/nginx/conf.d/bf_planning_location.conf"
+NGINX_SNIPPET="/etc/nginx/snippets/bf_planning_location.conf"
 BRUNO_CONF="/etc/nginx/sites-available/bruno"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -54,13 +54,14 @@ else
 fi
 
 echo "==> Configuring nginx..."
+mkdir -p /etc/nginx/snippets
 cp "$INSTALL_DIR/deploy/nginx-bf_planning.conf" "$NGINX_SNIPPET"
 
 # Inject include into the bruno SSL server block if not already present
 if [[ -f "$BRUNO_CONF" ]]; then
   if ! grep -q "bf_planning_location" "$BRUNO_CONF"; then
     # Insert the include line before the closing } of the first (SSL) server block
-    sed -i '/listen 443 ssl/a\    include /etc/nginx/conf.d/bf_planning_location.conf;' "$BRUNO_CONF"
+    sed -i '/listen 443 ssl/a\    include /etc/nginx/snippets/bf_planning_location.conf;' "$BRUNO_CONF"
     echo "    Injected include into $BRUNO_CONF"
   else
     echo "    Include already present in $BRUNO_CONF, skipping."
