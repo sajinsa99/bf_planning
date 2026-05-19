@@ -15,6 +15,23 @@ let selectedSlots = new Set(); // keys: "day-slot" e.g. "5-morning"
 let password = sessionStorage.getItem('bf_password') || '';
 let holidays = new Map(); // key: "YYYYMMDD", value: holiday name
 let filterDay = null;
+let currentUser = sessionStorage.getItem('bf_user') || null;
+
+function applyUser(user) {
+  currentUser = user;
+  sessionStorage.setItem('bf_user', user);
+  filter = user;
+  document.getElementById('filter-select').value = user;
+}
+
+function showWelcomeDialog() {
+  const dialog = document.getElementById('welcome-dialog');
+  document.getElementById('welcome-step-who').hidden = false;
+  document.getElementById('welcome-step-pwd').hidden = true;
+  document.getElementById('welcome-pwd-error').hidden = true;
+  dialog.addEventListener('cancel', e => e.preventDefault());
+  dialog.showModal();
+}
 
 function initFilters() {
   const monthSel = document.getElementById('month-select');
@@ -75,6 +92,7 @@ function renderCalendar() {
 
   document.getElementById('month-select').value = currentMonth;
   document.getElementById('day-select').value = filterDay ?? '';
+  document.getElementById('filter-select').value = filter;
   document.getElementById('view-filters').hidden = editMode;
   document.getElementById('reset-filters').hidden = filterDay === null;
   grid.classList.toggle('single-day', filterDay !== null);
@@ -164,6 +182,7 @@ function renderCalendar() {
   document.getElementById('edit-toggle').classList.toggle('active', editMode);
   document.getElementById('edit-toggle').textContent = editMode ? 'Quitter édition' : 'Mode édition';
   document.getElementById('filter-select').hidden = editMode;
+  document.getElementById('edit-toggle').hidden = currentUser !== 'Bruno';
 
   const actionBar = document.getElementById('action-bar');
   actionBar.hidden = !editMode || selectedSlots.size === 0;
@@ -361,5 +380,56 @@ document.getElementById('reset-filters').addEventListener('click', () => {
   fetchSchedule();
 });
 
+document.getElementById('welcome-yann').addEventListener('click', () => {
+  applyUser('Yann');
+  document.getElementById('welcome-dialog').close();
+  renderCalendar();
+});
+
+document.getElementById('welcome-bruno').addEventListener('click', () => {
+  document.getElementById('welcome-step-who').hidden = true;
+  document.getElementById('welcome-step-pwd').hidden = false;
+  document.getElementById('welcome-pwd-input').value = '';
+  document.getElementById('welcome-pwd-input').focus();
+});
+
+document.getElementById('welcome-pwd-submit').addEventListener('click', async () => {
+  const input = document.getElementById('welcome-pwd-input');
+  const error = document.getElementById('welcome-pwd-error');
+  const candidate = input.value;
+  const res = await fetch('api/auth', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: candidate })
+  });
+  const data = await res.json();
+  if (data.ok) {
+    password = candidate;
+    sessionStorage.setItem('bf_password', password);
+    editMode = true;
+    applyUser('Bruno');
+    document.getElementById('welcome-dialog').close();
+    renderCalendar();
+  } else {
+    error.hidden = false;
+    input.value = '';
+    input.focus();
+  }
+});
+
+document.getElementById('welcome-pwd-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('welcome-pwd-submit').click();
+});
+
+document.getElementById('welcome-pwd-skip').addEventListener('click', () => {
+  applyUser('Bruno');
+  document.getElementById('welcome-dialog').close();
+  renderCalendar();
+});
+
 initFilters();
-loadHolidays().then(fetchSchedule);
+if (currentUser) filter = currentUser;
+loadHolidays().then(() => {
+  fetchSchedule();
+  if (!currentUser) showWelcomeDialog();
+});

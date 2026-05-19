@@ -65,5 +65,25 @@
   </dialog>
 
   <script src="app.js"></script>
+
+  <dialog id="welcome-dialog">
+    <div id="welcome-step-who">
+      <h2>Bienvenue</h2>
+      <p>Qui êtes-vous ?</p>
+      <div class="welcome-choices">
+        <button type="button" id="welcome-yann">Yann</button>
+        <button type="button" id="welcome-bruno">Bruno</button>
+      </div>
+    </div>
+    <div id="welcome-step-pwd" hidden>
+      <h2>Bruno — Mot de passe</h2>
+      <input type="password" id="welcome-pwd-input" placeholder="Mot de passe" autocomplete="current-password">
+      <div class="dialog-buttons">
+        <button type="button" id="welcome-pwd-submit">Valider</button>
+        <button type="button" id="welcome-pwd-skip">Vue seule</button>
+      </div>
+      <p id="welcome-pwd-error" class="error" hidden>Mot de passe incorrect</p>
+    </div>
+  </dialog>
 </body>
 </html>
