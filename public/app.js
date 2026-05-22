@@ -96,9 +96,9 @@ async function fetchSchedule() {
   renderCalendar();
 }
 
-function renderMonthPanel(container, year, month, sched) {
+function renderMonthPanel(container, year, month, sched, isCurrent = false) {
   const panel = document.createElement('div');
-  panel.className = 'month-panel';
+  panel.className = 'month-panel' + (isCurrent ? ' current-month' : '');
 
   const title = document.createElement('div');
   title.className = 'month-panel-title';
@@ -224,8 +224,8 @@ function renderCalendar() {
 
   const container = document.getElementById('dual-calendar');
   container.innerHTML = '';
-  renderMonthPanel(container, currentYear, currentMonth, schedule);
-  renderMonthPanel(container, y2, m2, schedule2);
+  renderMonthPanel(container, currentYear, currentMonth, schedule, true);
+  renderMonthPanel(container, y2, m2, schedule2, false);
   container.classList.toggle('edit-mode', editMode);
 
   document.getElementById('edit-banner').hidden = !editMode;

@@ -137,6 +137,20 @@ header.edit-mode {
   padding-top: 1rem;
 }
 
+.month-panel.current-month .month-panel-title {
+  color: #1a6ab5;
+  font-size: 1.1rem;
+}
+
+.month-panel:not(.current-month) {
+  opacity: 0.75;
+}
+
+.month-panel:not(.current-month):hover {
+  opacity: 1;
+  transition: opacity 0.2s;
+}
+
 .month-panel-title {
   text-align: center;
   font-weight: 600;
