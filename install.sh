@@ -20,6 +20,14 @@ else
   echo "    node $(node --version) already installed, skipping."
 fi
 
+echo "==> Backing up data..."
+if [[ -d "$INSTALL_DIR/data" ]]; then
+  cp -r "$INSTALL_DIR/data" "/opt/bf_planning_data.bak"
+  echo "    Data backed up to /opt/bf_planning_data.bak"
+else
+  echo "    No existing data, nothing to back up."
+fi
+
 echo "==> Copying project to $INSTALL_DIR..."
 mkdir -p "$INSTALL_DIR"
 rsync -a --exclude='.git' --exclude='node_modules' --exclude='data' --exclude='.env' \
