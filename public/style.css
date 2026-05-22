@@ -83,6 +83,7 @@ header.edit-mode {
   padding: 0.5rem 1rem;
   background: #fff;
   border-bottom: 1px solid #ddd;
+  flex-wrap: wrap;
 }
 
 #view-filters[hidden] { display: none; }
