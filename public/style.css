@@ -131,6 +131,11 @@ header.edit-mode {
   min-width: 0;
 }
 
+.month-panel + .month-panel {
+  border-left: 1px solid #ddd;
+  padding-left: 1rem;
+}
+
 .month-panel-title {
   text-align: center;
   font-weight: 600;
@@ -445,6 +450,13 @@ dialog input {
 @media (max-width: 768px) {
   #dual-calendar {
     flex-direction: column;
+  }
+
+  .month-panel + .month-panel {
+    border-left: none;
+    border-top: 1px solid #ddd;
+    padding-left: 0;
+    padding-top: 1rem;
   }
 }
 
