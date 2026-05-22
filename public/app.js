@@ -10,13 +10,19 @@ const MONTHS_FR = [
 let currentYear = new Date().getFullYear();
 let currentMonth = new Date().getMonth() + 1;
 let schedule = {};
+let schedule2 = {};
 let editMode = false;
 let filter = 'all';
-let selectedSlots = new Set(); // keys: "day-slot" e.g. "5-morning"
+let selectedSlots = new Set(); // keys: "year-month-day-slot"
 let password = sessionStorage.getItem('bf_password') || '';
 let holidays = new Map(); // key: "YYYYMMDD", value: holiday name
 let filterDay = null;
 let currentUser = sessionStorage.getItem('bf_user') || null;
+
+function secondMonth() {
+  if (currentMonth === 12) return [currentYear + 1, 1];
+  return [currentYear, currentMonth + 1];
+}
 
 function applyUser(user) {
   currentUser = user;
@@ -75,34 +81,48 @@ function isPastDay(year, month, day) {
 }
 
 async function fetchSchedule() {
+  const [y2, m2] = secondMonth();
   try {
-    const res = await fetch(`api/schedule/${currentYear}/${currentMonth}`);
-    schedule = await res.json();
+    const [r1, r2] = await Promise.all([
+      fetch(`api/schedule/${currentYear}/${currentMonth}`),
+      fetch(`api/schedule/${y2}/${m2}`)
+    ]);
+    schedule = await r1.json();
+    schedule2 = await r2.json();
   } catch {
     schedule = {};
+    schedule2 = {};
   }
   renderCalendar();
 }
 
-function renderCalendar() {
-  document.getElementById('month-title').textContent =
-    `${MONTHS_FR[currentMonth - 1]} ${currentYear}`;
+function renderMonthPanel(container, year, month, sched) {
+  const panel = document.createElement('div');
+  panel.className = 'month-panel';
 
-  const grid = document.getElementById('calendar');
-  grid.innerHTML = '';
+  const title = document.createElement('div');
+  title.className = 'month-panel-title';
+  title.textContent = `${MONTHS_FR[month - 1]} ${year}`;
+  panel.appendChild(title);
 
-  document.getElementById('month-select').value = currentMonth;
-  document.getElementById('day-select').value = filterDay ?? '';
-  document.getElementById('filter-select').value = filter;
-  document.getElementById('view-filters').hidden = editMode;
-  document.getElementById('reset-filters').hidden = filterDay === null;
-  grid.classList.toggle('single-day', filterDay !== null);
+  const header = document.createElement('div');
+  header.className = 'calendar-grid';
+  ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].forEach(d => {
+    const div = document.createElement('div');
+    div.className = 'day-header';
+    div.textContent = d;
+    header.appendChild(div);
+  });
+  panel.appendChild(header);
+
+  const grid = document.createElement('div');
+  grid.className = 'calendar-grid';
+  if (filterDay !== null) grid.classList.add('single-day');
 
   const today = new Date();
-  const firstDay = new Date(currentYear, currentMonth - 1, 1);
-  const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+  const firstDay = new Date(year, month - 1, 1);
+  const daysInMonth = new Date(year, month, 0).getDate();
 
-  // Monday=0 offset
   let startOffset = firstDay.getDay() - 1;
   if (startOffset < 0) startOffset = 6;
 
@@ -119,14 +139,14 @@ function renderCalendar() {
     const cell = document.createElement('div');
     cell.className = 'day-cell';
 
-    const locked = isPastDay(currentYear, currentMonth, day);
+    const locked = isPastDay(year, month, day);
     if (locked) cell.classList.add('locked-day');
 
-    const dayOfWeek = new Date(currentYear, currentMonth - 1, day).getDay();
+    const dayOfWeek = new Date(year, month - 1, day).getDay();
     if (dayOfWeek === 0 || dayOfWeek === 6) cell.classList.add('weekend');
 
-    const isToday = today.getFullYear() === currentYear &&
-      today.getMonth() + 1 === currentMonth &&
+    const isToday = today.getFullYear() === year &&
+      today.getMonth() + 1 === month &&
       today.getDate() === day;
     if (isToday) cell.classList.add('today');
 
@@ -135,7 +155,7 @@ function renderCalendar() {
     num.textContent = day;
     cell.appendChild(num);
 
-    const yyyymmdd = `${currentYear}${String(currentMonth).padStart(2,'0')}${String(day).padStart(2,'0')}`;
+    const yyyymmdd = `${year}${String(month).padStart(2, '0')}${String(day).padStart(2, '0')}`;
     const holidayName = holidays.get(yyyymmdd);
     if (holidayName) {
       cell.classList.add('holiday');
@@ -149,7 +169,7 @@ function renderCalendar() {
 
     for (const slot of ['morning', 'evening']) {
       const slotEl = document.createElement('div');
-      const value = schedule[String(day)] && schedule[String(day)][slot] != null ? schedule[String(day)][slot] : null;
+      const value = sched[String(day)] && sched[String(day)][slot] != null ? sched[String(day)][slot] : null;
       const cssClass = value ? (value.startsWith('Yann') ? 'yann' : 'bruno') : 'empty';
       slotEl.className = `slot ${cssClass}`;
 
@@ -163,9 +183,13 @@ function renderCalendar() {
 
       slotEl.appendChild(label);
       slotEl.appendChild(name);
+      slotEl.dataset.year = year;
+      slotEl.dataset.month = month;
       slotEl.dataset.day = day;
       slotEl.dataset.slot = slot;
-      if (!locked && selectedSlots.has(`${day}-${slot}`)) slotEl.classList.add('selected');
+
+      const key = `${year}-${month}-${day}-${slot}`;
+      if (!locked && selectedSlots.has(key)) slotEl.classList.add('selected');
       if (!editMode && filter !== 'all') {
         const isMatch = filter === 'Manquant' ? value === null
           : filter === 'Yann' ? (value === 'Yann' || value === 'Yann+cat')
@@ -180,7 +204,30 @@ function renderCalendar() {
     grid.appendChild(cell);
   }
 
-  document.getElementById('calendar').classList.toggle('edit-mode', editMode);
+  panel.appendChild(grid);
+  container.appendChild(panel);
+}
+
+function renderCalendar() {
+  const [y2, m2] = secondMonth();
+
+  const titleText = y2 !== currentYear
+    ? `${MONTHS_FR[currentMonth - 1]} ${currentYear} — ${MONTHS_FR[m2 - 1]} ${y2}`
+    : `${MONTHS_FR[currentMonth - 1]} — ${MONTHS_FR[m2 - 1]} ${currentYear}`;
+  document.getElementById('month-title').textContent = titleText;
+
+  document.getElementById('month-select').value = currentMonth;
+  document.getElementById('day-select').value = filterDay ?? '';
+  document.getElementById('filter-select').value = filter;
+  document.getElementById('view-filters').hidden = editMode;
+  document.getElementById('reset-filters').hidden = filterDay === null;
+
+  const container = document.getElementById('dual-calendar');
+  container.innerHTML = '';
+  renderMonthPanel(container, currentYear, currentMonth, schedule);
+  renderMonthPanel(container, y2, m2, schedule2);
+  container.classList.toggle('edit-mode', editMode);
+
   document.getElementById('edit-banner').hidden = !editMode;
   document.querySelector('header').classList.toggle('edit-mode', editMode);
   document.getElementById('edit-toggle').classList.toggle('active', editMode);
@@ -199,9 +246,11 @@ function renderCalendar() {
 
 function handleSlotClick(e) {
   if (!editMode) return;
+  const year = parseInt(e.currentTarget.dataset.year, 10);
+  const month = parseInt(e.currentTarget.dataset.month, 10);
   const day = String(parseInt(e.currentTarget.dataset.day, 10));
   const slot = e.currentTarget.dataset.slot;
-  const key = `${day}-${slot}`;
+  const key = `${year}-${month}-${day}-${slot}`;
 
   if (selectedSlots.has(key)) {
     selectedSlots.delete(key);
@@ -213,15 +262,35 @@ function handleSlotClick(e) {
 
 async function applyToSelected(value) {
   if (selectedSlots.size === 0) return;
+
+  const [y2, m2] = secondMonth();
+  let modifiedMonth1 = false, modifiedMonth2 = false;
+
   for (const key of selectedSlots) {
-    const dash = key.indexOf('-');
-    const day = key.slice(0, dash);
-    const slot = key.slice(dash + 1);
-    if (!schedule[day]) schedule[day] = { morning: null, evening: null };
-    schedule[day][slot] = value;
+    const parts = key.split('-');
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10);
+    const day = parts[2];
+    const slot = parts[3];
+
+    if (year === currentYear && month === currentMonth) {
+      if (!schedule[day]) schedule[day] = { morning: null, evening: null };
+      schedule[day][slot] = value;
+      modifiedMonth1 = true;
+    } else {
+      if (!schedule2[day]) schedule2[day] = { morning: null, evening: null };
+      schedule2[day][slot] = value;
+      modifiedMonth2 = true;
+    }
   }
+
   selectedSlots.clear();
-  await saveSchedule();
+
+  const saves = [];
+  if (modifiedMonth1) saves.push(saveSchedule(currentYear, currentMonth, schedule));
+  if (modifiedMonth2) saves.push(saveSchedule(y2, m2, schedule2));
+  await Promise.all(saves);
+
   renderCalendar();
 }
 
@@ -230,15 +299,15 @@ function clearSelection() {
   renderCalendar();
 }
 
-async function saveSchedule() {
+async function saveSchedule(year, month, data) {
   try {
-    const res = await fetch(`api/schedule/${currentYear}/${currentMonth}`, {
+    const res = await fetch(`api/schedule/${year}/${month}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'x-password': password
       },
-      body: JSON.stringify(schedule)
+      body: JSON.stringify(data)
     });
     if (res.status === 401) {
       exitEditMode();
