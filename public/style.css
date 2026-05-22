@@ -120,6 +120,7 @@ header.edit-mode {
 
 #dual-calendar {
   display: flex;
+  flex-direction: column;
   gap: 1rem;
   padding: 0.5rem 1rem;
   max-width: 1400px;
@@ -132,8 +133,8 @@ header.edit-mode {
 }
 
 .month-panel + .month-panel {
-  border-left: 1px solid #ddd;
-  padding-left: 1rem;
+  border-top: 1px solid #ddd;
+  padding-top: 1rem;
 }
 
 .month-panel-title {
@@ -450,13 +451,6 @@ dialog input {
 @media (max-width: 768px) {
   #dual-calendar {
     flex-direction: column;
-  }
-
-  .month-panel + .month-panel {
-    border-left: none;
-    border-top: 1px solid #ddd;
-    padding-left: 0;
-    padding-top: 1rem;
   }
 }
 
