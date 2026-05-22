@@ -282,6 +282,39 @@ header.edit-mode {
   flex: 1;
 }
 
+.request-indicator {
+  font-size: 0.85rem;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 3px;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.request-indicator.empty {
+  opacity: 0.45;
+}
+
+.request-indicator.pending {
+  background: #fff3e0;
+  outline: 1px solid #f0a500;
+}
+
+.request-indicator.clickable {
+  cursor: pointer;
+}
+
+.request-indicator.clickable:hover {
+  background: #e8f0fc;
+}
+
+#edit-toggle.has-pending {
+  background: #fff3e0;
+  border-color: #f0a500;
+  color: #b36b00;
+  font-weight: 600;
+}
+
 .slot.yann .slot-name {
   color: #1a6ab5;
 }

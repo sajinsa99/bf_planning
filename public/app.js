@@ -188,6 +188,30 @@ function renderMonthPanel(container, year, month, sched, isCurrent = false) {
       slotEl.dataset.day = day;
       slotEl.dataset.slot = slot;
 
+      const requestStatus = sched[String(day)] && sched[String(day)].requests
+        ? sched[String(day)].requests[slot] || null
+        : null;
+      const isYannSlot = value === 'Yann' || value === 'Yann+cat';
+      const showIndicator = !locked && isYannSlot && currentUser !== 'Visitor'
+        && (requestStatus !== null || currentUser === 'Yann' || currentUser === 'Bruno');
+      if (showIndicator) {
+        const indicator = document.createElement('span');
+        indicator.className = `request-indicator ${requestStatus || 'empty'}`;
+        indicator.textContent = requestStatus === 'pending' ? '🟧'
+          : requestStatus === 'approved' ? '✅'
+          : requestStatus === 'refused' ? '❌'
+          : '☐';
+        indicator.title = requestStatus === 'pending' ? 'Demande en attente'
+          : requestStatus === 'approved' ? 'Demande validée'
+          : requestStatus === 'refused' ? 'Demande refusée'
+          : 'Demander à être libre';
+        if (currentUser === 'Yann' && !editMode) {
+          indicator.classList.add('clickable');
+          indicator.addEventListener('click', handleRequestClick);
+        }
+        slotEl.appendChild(indicator);
+      }
+
       const key = `${year}-${month}-${day}-${slot}`;
       if (!locked && selectedSlots.has(key)) slotEl.classList.add('selected');
       if (!editMode && filter !== 'all') {
@@ -231,7 +255,19 @@ function renderCalendar() {
   document.getElementById('edit-banner').hidden = !editMode;
   document.querySelector('header').classList.toggle('edit-mode', editMode);
   document.getElementById('edit-toggle').classList.toggle('active', editMode);
-  document.getElementById('edit-toggle').textContent = editMode ? 'Quitter édition' : 'Mode édition';
+
+  const pendingCount = countPendingRequests();
+  const editBtn = document.getElementById('edit-toggle');
+  if (editMode) {
+    editBtn.textContent = 'Quitter édition';
+  } else if (currentUser === 'Bruno' && pendingCount > 0) {
+    editBtn.textContent = `Mode édition · ${pendingCount} demande${pendingCount > 1 ? 's' : ''}`;
+    editBtn.classList.add('has-pending');
+  } else {
+    editBtn.textContent = 'Mode édition';
+    editBtn.classList.remove('has-pending');
+  }
+  if (editMode) editBtn.classList.remove('has-pending');
   document.getElementById('filter-select').hidden = editMode || currentUser === 'Visitor';
   document.getElementById('edit-toggle').hidden = currentUser !== 'Bruno';
 
@@ -256,6 +292,49 @@ function handleSlotClick(e) {
     selectedSlots.delete(key);
   } else {
     selectedSlots.add(key);
+  }
+  renderCalendar();
+}
+
+async function handleRequestClick(e) {
+  e.stopPropagation();
+  if (currentUser !== 'Yann' || editMode) return;
+  const slotEl = e.currentTarget.parentElement;
+  const year = parseInt(slotEl.dataset.year, 10);
+  const month = parseInt(slotEl.dataset.month, 10);
+  const day = parseInt(slotEl.dataset.day, 10);
+  const slot = slotEl.dataset.slot;
+
+  const sched = (year === currentYear && month === currentMonth) ? schedule : schedule2;
+  const current = sched[String(day)] && sched[String(day)].requests
+    ? sched[String(day)].requests[slot] || null
+    : null;
+  const newStatus = current === null ? 'pending' : null;
+
+  try {
+    const res = await fetch(`api/request/${year}/${month}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ day, slot, status: newStatus })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      alert(`Demande refusée: ${err.error || res.status}`);
+      return;
+    }
+  } catch {
+    return;
+  }
+
+  if (!sched[String(day)]) return;
+  if (newStatus === null) {
+    if (sched[String(day)].requests) {
+      delete sched[String(day)].requests[slot];
+      if (Object.keys(sched[String(day)].requests).length === 0) delete sched[String(day)].requests;
+    }
+  } else {
+    if (!sched[String(day)].requests) sched[String(day)].requests = {};
+    sched[String(day)].requests[slot] = 'pending';
   }
   renderCalendar();
 }
@@ -294,9 +373,59 @@ async function applyToSelected(value) {
   renderCalendar();
 }
 
+async function applyRequestStatus(newStatus) {
+  if (selectedSlots.size === 0) return;
+
+  const [y2, m2] = secondMonth();
+  let modifiedMonth1 = false, modifiedMonth2 = false;
+
+  for (const key of selectedSlots) {
+    const parts = key.split('-');
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10);
+    const day = parts[2];
+    const slot = parts[3];
+
+    const sched = (year === currentYear && month === currentMonth) ? schedule : schedule2;
+    const slots = sched[day];
+    if (!slots) continue;
+    const isYann = slots[slot] === 'Yann' || slots[slot] === 'Yann+cat';
+    if (!isYann) continue;
+    const current = slots.requests ? slots.requests[slot] : undefined;
+    if (current !== 'pending') continue;
+
+    if (!slots.requests) slots.requests = {};
+    slots.requests[slot] = newStatus;
+    if (year === currentYear && month === currentMonth) modifiedMonth1 = true;
+    else modifiedMonth2 = true;
+  }
+
+  selectedSlots.clear();
+
+  const saves = [];
+  if (modifiedMonth1) saves.push(saveSchedule(currentYear, currentMonth, schedule));
+  if (modifiedMonth2) saves.push(saveSchedule(y2, m2, schedule2));
+  await Promise.all(saves);
+
+  renderCalendar();
+}
+
 function clearSelection() {
   selectedSlots.clear();
   renderCalendar();
+}
+
+function countPendingRequests() {
+  let count = 0;
+  for (const sched of [schedule, schedule2]) {
+    for (const slots of Object.values(sched)) {
+      if (!slots.requests) continue;
+      for (const slot of ['morning', 'evening']) {
+        if (slots.requests[slot] === 'pending') count++;
+      }
+    }
+  }
+  return count;
 }
 
 async function saveSchedule(year, month, data) {
@@ -404,6 +533,8 @@ document.getElementById('apply-yann-cat').addEventListener('click', () => applyT
 document.getElementById('apply-bruno').addEventListener('click', () => applyToSelected('Bruno'));
 document.getElementById('apply-bruno-cat').addEventListener('click', () => applyToSelected('Bruno+cat'));
 document.getElementById('apply-clear').addEventListener('click', () => applyToSelected(null));
+document.getElementById('apply-validate').addEventListener('click', () => applyRequestStatus('approved'));
+document.getElementById('apply-refuse').addEventListener('click', () => applyRequestStatus('refused'));
 document.getElementById('deselect-all').addEventListener('click', clearSelection);
 
 document.getElementById('edit-toggle').addEventListener('click', toggleEditMode);
