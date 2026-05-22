@@ -320,7 +320,9 @@ header.edit-mode {
 }
 
 #apply-yann { background: #e8f0fc; border-color: #4a90d9; color: #1a6ab5; font-weight: 600; }
+#apply-yann-cat { background: #e8f0fc; border-color: #4a90d9; color: #1a6ab5; font-weight: 600; }
 #apply-bruno { background: #fef0e0; border-color: #d08040; color: #c06010; font-weight: 600; }
+#apply-bruno-cat { background: #fef0e0; border-color: #d08040; color: #c06010; font-weight: 600; }
 #apply-clear { background: #f5f5f5; }
 
 dialog {

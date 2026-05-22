@@ -1,6 +1,7 @@
 'use strict';
 
 const NAMES = [null, 'Yann', 'Bruno'];
+const SLOT_DISPLAY = { 'Yann': 'Yann', 'Yann+cat': 'Yann 🐱', 'Bruno': 'Bruno', 'Bruno+cat': 'Bruno 🐱' };
 const MONTHS_FR = [
   'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
   'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
@@ -149,8 +150,8 @@ function renderCalendar() {
     for (const slot of ['morning', 'evening']) {
       const slotEl = document.createElement('div');
       const value = schedule[String(day)] && schedule[String(day)][slot] != null ? schedule[String(day)][slot] : null;
-      const nameClass = value ? value.toLowerCase() : 'empty';
-      slotEl.className = `slot ${nameClass}`;
+      const cssClass = value ? (value.startsWith('Yann') ? 'yann' : 'bruno') : 'empty';
+      slotEl.className = `slot ${cssClass}`;
 
       const label = document.createElement('span');
       label.className = 'slot-label';
@@ -158,7 +159,7 @@ function renderCalendar() {
 
       const name = document.createElement('span');
       name.className = 'slot-name';
-      name.textContent = value || '—';
+      name.textContent = value ? (SLOT_DISPLAY[value] || value) : '—';
 
       slotEl.appendChild(label);
       slotEl.appendChild(name);
@@ -166,7 +167,10 @@ function renderCalendar() {
       slotEl.dataset.slot = slot;
       if (!locked && selectedSlots.has(`${day}-${slot}`)) slotEl.classList.add('selected');
       if (filter !== 'all') {
-        const isMatch = filter === 'Manquant' ? value === null : value === filter;
+        const isMatch = filter === 'Manquant' ? value === null
+          : filter === 'Yann' ? (value === 'Yann' || value === 'Yann+cat')
+          : filter === 'Bruno' ? (value === 'Bruno' || value === 'Bruno+cat')
+          : value === filter;
         if (!isMatch) slotEl.classList.add('filtered-out');
       }
       if (!locked) slotEl.addEventListener('click', handleSlotClick);
@@ -327,7 +331,9 @@ document.getElementById('filter-select').addEventListener('change', (e) => {
 });
 
 document.getElementById('apply-yann').addEventListener('click', () => applyToSelected('Yann'));
+document.getElementById('apply-yann-cat').addEventListener('click', () => applyToSelected('Yann+cat'));
 document.getElementById('apply-bruno').addEventListener('click', () => applyToSelected('Bruno'));
+document.getElementById('apply-bruno-cat').addEventListener('click', () => applyToSelected('Bruno+cat'));
 document.getElementById('apply-clear').addEventListener('click', () => applyToSelected(null));
 document.getElementById('deselect-all').addEventListener('click', clearSelection);
 

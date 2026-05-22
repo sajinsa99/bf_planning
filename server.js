@@ -16,7 +16,7 @@ if (!APP_PASSWORD) {
 
 const DATA_DIR = path.join(__dirname, 'data');
 
-const VALID_NAMES = new Set(['Yann', 'Bruno']);
+const VALID_NAMES = new Set(['Yann', 'Bruno', 'Yann+cat', 'Bruno+cat']);
 
 function dataFile(year, month) {
   return path.join(DATA_DIR, `${year}-${String(month).padStart(2, '0')}.json`);
