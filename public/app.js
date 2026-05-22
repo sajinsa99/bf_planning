@@ -232,7 +232,7 @@ function renderCalendar() {
   document.querySelector('header').classList.toggle('edit-mode', editMode);
   document.getElementById('edit-toggle').classList.toggle('active', editMode);
   document.getElementById('edit-toggle').textContent = editMode ? 'Quitter édition' : 'Mode édition';
-  document.getElementById('filter-select').hidden = editMode;
+  document.getElementById('filter-select').hidden = editMode || currentUser === 'Visitor';
   document.getElementById('edit-toggle').hidden = currentUser !== 'Bruno';
 
   const actionBar = document.getElementById('action-bar');
@@ -496,6 +496,14 @@ document.getElementById('welcome-pwd-input').addEventListener('keydown', (e) => 
   if (e.key === 'Enter') document.getElementById('welcome-pwd-submit').click();
 });
 
+document.getElementById('welcome-visitor').addEventListener('click', () => {
+  currentUser = 'Visitor';
+  sessionStorage.setItem('bf_user', 'Visitor');
+  filter = 'all';
+  document.getElementById('welcome-dialog').close();
+  renderCalendar();
+});
+
 document.getElementById('welcome-pwd-skip').addEventListener('click', () => {
   applyUser('Bruno');
   document.getElementById('welcome-dialog').close();
@@ -503,7 +511,7 @@ document.getElementById('welcome-pwd-skip').addEventListener('click', () => {
 });
 
 initFilters();
-if (currentUser) filter = currentUser;
+if (currentUser && currentUser !== 'Visitor') filter = currentUser;
 loadHolidays().then(() => {
   fetchSchedule();
   if (!currentUser) showWelcomeDialog();
