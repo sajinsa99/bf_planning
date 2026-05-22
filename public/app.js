@@ -166,7 +166,7 @@ function renderCalendar() {
       slotEl.dataset.day = day;
       slotEl.dataset.slot = slot;
       if (!locked && selectedSlots.has(`${day}-${slot}`)) slotEl.classList.add('selected');
-      if (filter !== 'all') {
+      if (!editMode && filter !== 'all') {
         const isMatch = filter === 'Manquant' ? value === null
           : filter === 'Yann' ? (value === 'Yann' || value === 'Yann+cat')
           : filter === 'Bruno' ? (value === 'Bruno' || value === 'Bruno+cat')
