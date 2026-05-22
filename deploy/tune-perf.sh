@@ -164,7 +164,7 @@ apply() {
   apply_nginx_http
 
   echo "==> Testing nginx config..."
-  if nginx -t 2>/dev/null; then
+  if nginx -t; then
     systemctl reload nginx
     echo "  nginx reloaded OK"
   else
@@ -197,7 +197,7 @@ restore() {
     cp "$BACKUP_DIR/nginx.conf.bak" "$NGINX_CONF"
     rm -f "$NGINX_HTTP_TUNE"
     echo "  nginx.conf restored; http drop-in removed"
-    if nginx -t 2>/dev/null; then
+    if nginx -t; then
       systemctl reload nginx
       echo "  nginx reloaded OK"
     else
