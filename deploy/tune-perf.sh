@@ -123,7 +123,6 @@ apply_nginx_http() {
 
 keepalive_requests  1000;
 
-gzip            on;
 gzip_comp_level 4;
 gzip_types      text/plain text/css application/json application/javascript
                 text/xml application/xml text/javascript;
