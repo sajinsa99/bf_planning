@@ -133,22 +133,35 @@ header.edit-mode {
 }
 
 .month-panel + .month-panel {
-  border-top: 1px solid #ddd;
+  border-top: 2px solid #ddd;
   padding-top: 1rem;
+}
+
+.month-panel.current-month {
+  background: #f0f6ff;
+  border-radius: 8px;
+  padding: 0.5rem;
 }
 
 .month-panel.current-month .month-panel-title {
   color: #1a6ab5;
-  font-size: 1.1rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
 }
 
 .month-panel:not(.current-month) {
-  opacity: 0.75;
+  opacity: 0.6;
 }
 
 .month-panel:not(.current-month):hover {
   opacity: 1;
   transition: opacity 0.2s;
+}
+
+.month-panel:not(.current-month) .month-panel-title {
+  font-size: 0.95rem;
+  color: #888;
 }
 
 .month-panel-title {
