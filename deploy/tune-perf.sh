@@ -97,6 +97,9 @@ apply_nginx_events() {
   # Raise worker_connections from Ubuntu default (768) to 1024
   sed -i 's/worker_connections[[:space:]]\+[0-9]\+;/worker_connections 1024;/' "$NGINX_CONF"
 
+  # Lower keepalive_timeout from Ubuntu default (65) to 30
+  sed -i 's/keepalive_timeout[[:space:]]\+[0-9]\+;/keepalive_timeout 30;/' "$NGINX_CONF"
+
   # Enable multi_accept: uncomment if commented out
   if grep -q '#.*multi_accept' "$NGINX_CONF"; then
     sed -i 's/#[[:space:]]*multi_accept on;/multi_accept on;/' "$NGINX_CONF"
@@ -118,11 +121,7 @@ apply_nginx_http() {
 # bf_planning perf tuning -- http-level overrides
 # restore: sudo bash tune-perf.sh --restore
 
-keepalive_timeout   30;
 keepalive_requests  1000;
-
-tcp_nopush  on;
-tcp_nodelay on;
 
 gzip            on;
 gzip_comp_level 4;
