@@ -520,6 +520,63 @@ dialog input {
   }
 }
 
+#legend {
+  margin: 1.5rem auto;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  max-width: 480px;
+  width: 100%;
+}
+
+#legend th {
+  background: #f0f0f0;
+  padding: 0.4rem 0.8rem;
+  text-align: left;
+  font-weight: 600;
+  border: 1px solid #ddd;
+}
+
+#legend td {
+  padding: 0.35rem 0.8rem;
+  border: 1px solid #eee;
+  vertical-align: middle;
+}
+
+.legend-icon {
+  text-align: center;
+  font-weight: 600;
+  white-space: nowrap;
+  width: 90px;
+}
+
+.legend-yann {
+  color: #1a6ab5;
+  background: #eaf1fb;
+}
+
+.legend-bruno {
+  color: #c06010;
+  background: #fef0e0;
+}
+
+.legend-empty {
+  color: #e05050;
+}
+
+.legend-today {
+  background: #fef9c3;
+  color: #333;
+}
+
+.legend-weekend {
+  background: #f0ede8;
+  color: #333;
+}
+
+.legend-locked {
+  color: #999;
+}
+
 @media (max-width: 600px) {
   .day-cell {
     min-height: 60px;
