@@ -204,6 +204,11 @@ header.edit-mode {
 .day-cell.today {
   border-color: #4a90d9;
   border-width: 2px;
+  background: #fef9c3;
+}
+
+.day-cell.weekend.today {
+  background: #fef9c3;
 }
 
 .day-number {
