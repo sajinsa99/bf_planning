@@ -23,7 +23,7 @@ const VALID_REQUEST_STATUSES = new Set(['pending', 'approved', 'refused']);
 function dataFile(year, month) {
   const y = parseInt(year, 10);
   const m = parseInt(month, 10);
-  return path.join(DATA_DIR, `${y}-${String(m).padStart(2, '0')}.json`);
+  return path.join(DATA_DIR, `${y}-${String(m).padStart(2, '0')}.json`); // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
 }
 
 function validateParams(year, month) {

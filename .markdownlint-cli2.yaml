@@ -1,1 +1,3 @@
-MD013: false
+---
+config:
+  MD013: false
