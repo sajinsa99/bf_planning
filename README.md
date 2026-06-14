@@ -18,18 +18,18 @@ vi /opt/bf_planning/.env   # créer le fichier .env (voir ci-dessous)
 
 Contenu du fichier `.env` :
 
-```
+```env
 APP_PASSWORD=votre-mot-de-passe-secret
 PORT=3000
 ```
 
-L'application sera accessible sur **https://bfablet92.hd.free.fr/planning/**
+L'application sera accessible sur **<https://bfablet92.hd.free.fr/planning/>**
 
 > `install.sh` injecte automatiquement la configuration nginx dans le vhost existant.
 
 ## Structure du projet
 
-```
+```text
 bf_planning/
 ├── server.js                  # Backend Express
 ├── package.json

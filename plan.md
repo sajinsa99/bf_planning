@@ -13,7 +13,7 @@ Build a lightweight monthly calendar web app showing who (Yann or Bruno) is on d
 
 ## Project Structure
 
-```
+```text
 bf_planning/
 ├── package.json
 ├── server.js                 # Express backend (~80 lines)
@@ -35,12 +35,14 @@ bf_planning/
 ### Backend (`server.js`)
 
 **API endpoints:**
+
 - `GET /api/schedule/:year/:month` — returns month data (or empty if no file)
 - `POST /api/schedule/:year/:month` — saves month data (requires `x-password` header)
 - `POST /api/auth` — validates password, returns `{ ok: true/false }`
 - Static files served from `public/`
 
 **Data format** (`data/2026-04.json`):
+
 ```json
 {
   "1": { "morning": "Yann", "evening": "Bruno" },
@@ -60,6 +62,7 @@ bf_planning/
 **`style.css`:** CSS Grid (7 columns for Mon–Sun), cells with morning/evening sub-rows, color-coded (blue=Yann, orange=Bruno, gray=empty). Responsive for mobile.
 
 **`app.js`:**
+
 - State: `currentYear`, `currentMonth`, `schedule`, `editMode`, `password` (sessionStorage)
 - `fetchSchedule()` — GET API, populate state
 - `renderCalendar()` — build DOM grid for current month

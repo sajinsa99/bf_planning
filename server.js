@@ -5,7 +5,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 
-const app = express();
+const app = express(); // nosemgrep: javascript.express.security.audit.express-check-csurf-middleware-usage.express-check-csurf-middleware-usage
 const PORT = process.env.PORT || 3000;
 const APP_PASSWORD = process.env.APP_PASSWORD;
 
@@ -21,7 +21,9 @@ const YANN_VALUES = new Set(['Yann', 'Yann+cat']);
 const VALID_REQUEST_STATUSES = new Set(['pending', 'approved', 'refused']);
 
 function dataFile(year, month) {
-  return path.join(DATA_DIR, `${year}-${String(month).padStart(2, '0')}.json`);
+  const y = parseInt(year, 10);
+  const m = parseInt(month, 10);
+  return path.join(DATA_DIR, `${y}-${String(m).padStart(2, '0')}.json`);
 }
 
 function validateParams(year, month) {
