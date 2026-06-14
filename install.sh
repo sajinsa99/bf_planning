@@ -65,19 +65,24 @@ echo "==> Configuring nginx..."
 mkdir -p /etc/nginx/snippets
 cp "$INSTALL_DIR/deploy/nginx-bf_planning.conf" "$NGINX_SNIPPET"
 
-# Inject include into the bruno SSL server block, replacing any stale path
+# Défaire l'ancienne injection individuelle si elle existe encore
+if [[ -f "$BRUNO_CONF" ]] && grep -q "bf_planning_location" "$BRUNO_CONF"; then
+  sed -i '/include.*bf_planning_location\.conf/d' "$BRUNO_CONF"
+  echo "    Removed stale per-project include from $BRUNO_CONF"
+fi
+
+# Le vhost bruno doit contenir : include /etc/nginx/snippets/*_location.conf;
+# Ajouter ce glob include s'il n'est pas encore présent
 if [[ -f "$BRUNO_CONF" ]]; then
-  if grep -q "bf_planning_location" "$BRUNO_CONF"; then
-    # Replace whatever path was previously injected with the correct one
-    sed -i "s|include .*/bf_planning_location.conf;|include $NGINX_SNIPPET;|" "$BRUNO_CONF"
-    echo "    Updated include path in $BRUNO_CONF"
+  if ! grep -q 'snippets/\*_location\.conf' "$BRUNO_CONF"; then
+    sed -i '/listen 443 ssl/a\    include /etc/nginx/snippets/*_location.conf;' "$BRUNO_CONF"
+    echo "    Added glob include to $BRUNO_CONF"
   else
-    sed -i '/listen 443 ssl/a\    include /etc/nginx/snippets/bf_planning_location.conf;' "$BRUNO_CONF"
-    echo "    Injected include into $BRUNO_CONF"
+    echo "    Glob include already present in $BRUNO_CONF"
   fi
 else
   echo "  WARNING: $BRUNO_CONF not found. Add manually to your nginx vhost:" >&2
-  echo "    include $NGINX_SNIPPET;" >&2
+  echo "    include /etc/nginx/snippets/*_location.conf;" >&2
 fi
 
 nginx -t
