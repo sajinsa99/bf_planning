@@ -25,15 +25,18 @@ npm start                 # node server.js, listens on PORT (default 3000)
 There is **no test suite** in this repo.
 
 ### Linting / checks
+
 ```bash
 bash checks.sh            # runs all linters/scanners in the xmk_linters Docker image → checks-report.md
 ```
+
 `checks.sh` requires Docker (pulls an internal SAP linter image) and runs markdownlint,
 eslint, semgrep, trivy, gitleaks, etc.
 
 ## Architecture
 
 ### Data model
+
 - One file per month: `data/YYYY-MM.json` (e.g. `data/2026-04.json`), gitignored.
 - Shape: `{ "<day>": { "morning": <name|null>, "evening": <name|null>, "requests"?: {...} } }`
   where day is `"1"`..`"31"`.
@@ -43,6 +46,7 @@ eslint, semgrep, trivy, gitleaks, etc.
   (`pending`/`approved`/`refused`). It represents Yann asking to be relieved of a slot.
 
 ### Server (`server.js`, CommonJS)
+
 - `APP_PASSWORD` **must** be set (via env or `.env`, loaded by dotenv) or the process exits at
   startup. Auth is a single shared password.
 - Write/edit endpoints require the password in the `x-password` header; GET is public.
@@ -56,15 +60,16 @@ eslint, semgrep, trivy, gitleaks, etc.
 ### API
 
 | Method | URL | Auth | Description |
-|--------|-----|------|-------------|
+| -------- | ----- | ------ | ------------- |
 | POST | `/api/auth` | — | Returns `{ ok }` if the posted password matches |
-| GET  | `/api/schedule/:year/:month` | — | Returns the month's data (`{}` if none) |
+| GET | `/api/schedule/:year/:month` | — | Returns the month's data (`{}` if none) |
 | POST | `/api/schedule/:year/:month` | `x-password` header | Validates, scrubs, and saves the whole month |
 | POST | `/api/request/:year/:month` | — | Set (`pending`) or clear (`null`) a request on a Yann slot |
 
 `validateParams` enforces year 2020–2100 and month 1–12.
 
 ### Deployment
+
 `install.sh` (run as **root** on Ubuntu 24.04) deploys to `/opt/bf_planning`, installs the
 `deploy/bf_planning.service` systemd unit (runs as `www-data`), and injects the
 `deploy/nginx-bf_planning.conf` snippet into the existing nginx vhost `/etc/nginx/sites-available/bruno`
@@ -73,6 +78,7 @@ at `/planning/`. The Express app serves from `/`; nginx reverse-proxies it under
 started until `.env` (with `APP_PASSWORD`) exists.
 
 ## Conventions
+
 - Node is pinned to 20.20.2 / npm 10.8.2 (see `package.json` engines and `.nvmrc`).
 - Dependencies are only `express` and `dotenv` — keep the footprint minimal.
 - Gitignored: `node_modules/`, `data/*.json`, `.env`, `tmp/`, `.vscode/`.

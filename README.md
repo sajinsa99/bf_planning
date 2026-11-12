@@ -49,7 +49,7 @@ bf_planning/
 ## API
 
 | Méthode | URL | Description |
-|---------|-----|-------------|
+| --------- | ----- | ------------- |
 | GET | `/api/schedule/:year/:month` | Retourne les données du mois |
 | POST | `/api/schedule/:year/:month` | Sauvegarde le mois (header `x-password` requis) |
 | POST | `/api/auth` | Vérifie le mot de passe |
