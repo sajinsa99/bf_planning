@@ -178,6 +178,8 @@ header.edit-mode {
   grid-template-columns: 1fr;
   max-width: 200px;
 }
+
+.day-header {
   text-align: center;
   font-weight: 600;
   font-size: 0.85rem;
